@@ -23,7 +23,7 @@
 
 # Directories
 /data/
-/data/raw/
+/data/raw
 /logs/
 /debug/
 
