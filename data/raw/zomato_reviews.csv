@@ -1,0 +1,46 @@
+restaurant_name,reviewer,rating,rating_type,review_text,date,extraction_method,driver_status
+2BHK Diner & Key Club,Vaibhav,5,DINING,sanjay raj was very fast in service and we got food within seconds. very sweet ambience and good vibes,N/A,*:contains(☆) (no rating found) + json-ld rating,closed
+2BHK Diner & Key Club,Ajay Aggarwal,5,DINING,Ajay Aggarwal,N/A,*:contains(☆) (no rating found) + json-ld rating,closed
+2BHK Diner & Key Club,Akhya Omar,5,DINING,good services by pramod,N/A,*:contains(☆) (no rating found) + json-ld rating,closed
+2BHK Diner & Key Club,Telecom Solutions,5,DINING,Telecom Solutions,N/A,*:contains(☆) (no rating found) + json-ld rating,closed
+2BHK Diner & Key Club,Ravi Arora,5,DINING,Ashirvad gave us a fabulous experience.,N/A,*:contains(☆) (no rating found) + json-ld rating,closed
+2BHK Diner & Key Club,Surbhi Khandelwal,N/A,DINING,Surbhi Khandelwal,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Onkar,N/A,DINING,N/A,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Kshitij Sharma,N/A,DINING,Kshitij Sharma,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Joemon Johnson,N/A,DINING,Joemon Johnson,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,User,N/A,DINING,N/A,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Vaibhav,5,DINING,sanjay raj was very fast in service and we got food within seconds. very sweet ambience and good vibes,N/A,json-ld,closed
+2BHK Diner & Key Club,Ajay Aggarwal,5,DINING,Sanjay Raj did a great work,N/A,json-ld,closed
+2BHK Diner & Key Club,Akhya Omar,5,DINING,good services by pramod,N/A,json-ld,closed
+2BHK Diner & Key Club,Telecom Solutions,5,DINING,Food was excellent . Well guided by Vinay Kumar for choice of food.,N/A,json-ld,closed
+2BHK Diner & Key Club,Ravi Arora,5,DINING,Ashirvad gave us a fabulous experience.,N/A,json-ld,closed
+2BHK Diner & Key Club,Ranu Laddha,N/A,DINING,Ranu Laddha,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Diksha Vagge,N/A,DINING,Diksha Vagge,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Shubham,N/A,DINING,N/A,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Gajanan Kurhade,N/A,DINING,Gajanan Kurhade,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Mrunal,N/A,DINING,N/A,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Vaibhav,5,DINING,sanjay raj was very fast in service and we got food within seconds. very sweet ambience and good vibes,N/A,json-ld,closed
+2BHK Diner & Key Club,Ajay Aggarwal,5,DINING,Sanjay Raj did a great work,N/A,json-ld,closed
+2BHK Diner & Key Club,Akhya Omar,5,DINING,good services by pramod,N/A,json-ld,closed
+2BHK Diner & Key Club,Telecom Solutions,5,DINING,Food was excellent . Well guided by Vinay Kumar for choice of food.,N/A,json-ld,closed
+2BHK Diner & Key Club,Ravi Arora,5,DINING,Ashirvad gave us a fabulous experience.,N/A,json-ld,closed
+2BHK Diner & Key Club,Pankaj Shinde,N/A,DINING,Pankaj Shinde,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Ameya Joshi,N/A,DINING,Ameya Joshi,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Shubhra Kasana,N/A,DINING,Shubhra Kasana,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Nihal Wasta,N/A,DINING,Nihal Wasta,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Ashutosh Vaishnav,N/A,DINING,Ashutosh Vaishnav,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Vaibhav,5,DINING,sanjay raj was very fast in service and we got food within seconds. very sweet ambience and good vibes,N/A,json-ld,closed
+2BHK Diner & Key Club,Ajay Aggarwal,5,DINING,Sanjay Raj did a great work,N/A,json-ld,closed
+2BHK Diner & Key Club,Akhya Omar,5,DINING,good services by pramod,N/A,json-ld,closed
+2BHK Diner & Key Club,Telecom Solutions,5,DINING,Food was excellent . Well guided by Vinay Kumar for choice of food.,N/A,json-ld,closed
+2BHK Diner & Key Club,Ravi Arora,5,DINING,Ashirvad gave us a fabulous experience.,N/A,json-ld,closed
+2BHK Diner & Key Club,Komal Bole,N/A,DINING,N/A,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Shanaya Sachdev,N/A,DINING,Shanaya Sachdev,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Piyush Kamra,N/A,DINING,Piyush Kamra,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Mayank Srivastava,N/A,DINING,Mayank Srivastava,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Vijay Mathur,N/A,DINING,Vijay Mathur,N/A,*:contains(☆) (no rating found),closed
+2BHK Diner & Key Club,Vaibhav,5,DINING,sanjay raj was very fast in service and we got food within seconds. very sweet ambience and good vibes,N/A,json-ld,closed
+2BHK Diner & Key Club,Ajay Aggarwal,5,DINING,Sanjay Raj did a great work,N/A,json-ld,closed
+2BHK Diner & Key Club,Akhya Omar,5,DINING,good services by pramod,N/A,json-ld,closed
+2BHK Diner & Key Club,Telecom Solutions,5,DINING,Food was excellent . Well guided by Vinay Kumar for choice of food.,N/A,json-ld,closed
+2BHK Diner & Key Club,Ravi Arora,5,DINING,Ashirvad gave us a fabulous experience.,N/A,json-ld,closed

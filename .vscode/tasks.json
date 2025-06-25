@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Analyze Zomato Image for Ratings",
+			"type": "shell",
+			"command": "file /mnt/data/projects/data-analysis/restau_view/data/raw/resturant_deatil_review_main_inspect_1.png",
+			"group": "analyze",
+			"isBackground": false
+		}
+	]
+}

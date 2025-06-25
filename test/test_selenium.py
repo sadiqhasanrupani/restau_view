@@ -19,11 +19,12 @@ def test_selenium_chrome():
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # Test navigation
-        driver.get("https://www.google.com")
+        driver.get("https://www.google.com?q=zomato")
         
         # Get page title
         title = driver.title
-        print(f"✅ Success! Page title: {title}")
+        
+        print(f"Success! Page title: {title}")
         
         # Close driver
         driver.quit()
@@ -31,7 +32,7 @@ def test_selenium_chrome():
         return True
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         return False
 
 if __name__ == "__main__":
