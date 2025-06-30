@@ -113,7 +113,12 @@ def create_stealth_driver():
     chrome_options.add_experimental_option("detach", True)
 
     try:
-        service = Service("/usr/bin/chromedriver")
+        # Get ChromeDriver path from environment variable
+        chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
+        if not chromedriver_path:
+            raise Exception("CHROMEDRIVER_PATH environment variable not set")
+        
+        service = Service(chromedriver_path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
         # Execute stealth scripts
@@ -292,9 +297,9 @@ def extract_reviews_with_multiple_selectors(soup, restaurant_name="N/A"):
 
             for idx, section in enumerate(review_sections):
                 try:
-                    # Extract reviewer name (based on actual HTML structure)
+                    # Extract reviewer name using the correct class name from HTML analysis
                     reviewer_selectors = [
-                        "p.sc-1hez2tp-0.sc-lenlpJ.dCAQIv",  # Specific class for reviewer names
+                        "p.sc-1hez2tp-0.sc-lenlpJ.dCAQIv",  # Specific class for reviewer names from HTML analysis
                         "p.sc-1hez2tp-0.sc-lenlpJ",
                         "div.sc-kGYfcE div p",
                         "p[class*='reviewer']",
@@ -312,17 +317,18 @@ def extract_reviews_with_multiple_selectors(soup, restaurant_name="N/A"):
                             reviewer = rev_elem.get_text(strip=True)
                             break
 
-                    # For this data, we're going to extract ratings from the HTML structure and JSON-LD data
-                    # First try HTML extraction for ratings
+                    # Extract rating using the correct class name from HTML analysis
                     rating = "N/A"
-                    rating_type = "DINING"  # Default to DINING as it's most common
-
-                    # APPROACH 1: Extract from specific rating-related elements
                     rating_selectors = [
-                        "div[class*='rating']", "span[class*='rating']", 
-                        "div[class*='star']", "span[class*='star']",
-                        # Look for elements containing star symbols
-                        "*:contains(★)", "*:contains(⭐)", "*:contains(☆)"
+                        "div.sc-1q7bklc-1.cILgox",  # Specific class for rating number from HTML analysis
+                        "div.sc-1q7bklc-1",
+                        "div[class*='rating']", 
+                        "span[class*='rating']", 
+                        "div[class*='star']", 
+                        "span[class*='star']",
+                        "*:contains(★)", 
+                        "*:contains(⭐)", 
+                        "*:contains(☆)"
                     ]
 
                     for selector in rating_selectors:
@@ -342,106 +348,58 @@ def extract_reviews_with_multiple_selectors(soup, restaurant_name="N/A"):
                                         break
                         except Exception:
                             continue
-                            
-                    # APPROACH 2: Look for SVG star icons which Zomato uses
-                    if rating == "N/A":
-                        try:
-                            # Find all SVG elements that might represent stars
-                            svg_stars = section.find_all('svg', {
-                                'class': lambda x: x and ('star' in x.lower() if x else False)
-                            }) or section.find_all('svg', {
-                                'title': lambda x: x and ('star' in x.lower() if x else False)
-                            })
-                            
-                            if svg_stars:
-                                # Count the number of filled stars
-                                filled_stars = []
-                                for svg in svg_stars:
-                                    # Check for attributes that might indicate a filled star
-                                    # Filled stars often have different classes or fill attributes
-                                    if svg.get('fill') and svg.get('fill') != 'none':
-                                        filled_stars.append(svg)
-                                    elif svg.find('path', {'fill': lambda x: x and x != 'none'}):
-                                        filled_stars.append(svg)
-                                    elif any('filled' in cls.lower() for cls in svg.get('class', [])):
-                                        filled_stars.append(svg)
-                                
-                                if filled_stars:
-                                    # If we have 1-5 filled stars, that's our rating
-                                    star_count = len(filled_stars)
-                                    if 1 <= star_count <= 5:
-                                        rating = str(star_count)
-                                    print(f"[DEBUG] Found {star_count} filled SVG stars")
-                                
-                                # If that doesn't work, look for text near the stars
-                                if rating == "N/A":
-                                    for star in svg_stars:
-                                        parent = star.parent
-                                        if parent:
-                                            # Look for text nearby that might contain the rating
-                                            text = parent.get_text(strip=True)
-                                            numbers = re.findall(r'(\d+(\.\d+)?)', text)
-                                            if numbers:
-                                                for num in numbers:
-                                                    if 1 <= float(num[0]) <= 5:
-                                                        rating = num[0]
-                                                        break
-                                                if rating != "N/A":
-                                                    break
-                        except Exception as e:
-                            print(f"[DEBUG] Error extracting SVG stars: {e}")
-                            pass
 
-                    # APPROACH 3: Check any text containing rating patterns
-                    if rating == "N/A":
-                        for element in section.find_all(text=True):
-                            try:
-                                text = str(element).strip()
-                                # Look for patterns like "Rated 4.0" or "4.5/5" or "rating: 3"
-                                rating_patterns = ['rated', '/5', 'rating', 'stars', 'star', 'voted', 'gave']
-                                if any(pattern in text.lower() for pattern in rating_patterns):
-                                    numbers = re.findall(r'(\d+(\.\d+)?)', text)
-                                    if numbers:
-                                        for num in numbers:
-                                            if 1 <= float(num[0]) <= 5:
-                                                rating = num[0]
-                                                break
-                                        if rating != "N/A":
-                                            break
-                            except Exception:
-                                continue
+                    # Extract rating type using the correct class name from HTML analysis
+                    rating_type = "DINING"  # Default to DINING as it's most common
+                    rating_type_selectors = [
+                        "div.sc-1q7bklc-9.dYrjiw",  # Specific class for rating type from HTML analysis
+                        "div.sc-1q7bklc-9",
+                        "div[class*='rating-type']",
+                        "span[class*='rating-type']",
+                        "div[class*='dining']",
+                        "div[class*='delivery']",
+                    ]
 
-                    # APPROACH 4: Look for any element with single digit 1-5
-                    if rating == "N/A":
-                        for element in section.find_all():
-                            try:
-                                text = element.get_text(strip=True)
-                                if text in ['1', '2', '3', '4', '5']:
-                                    # Make sure it's not part of another text like "15 comments"
-                                    if len(text) == 1 or text[1] in ['.', ' '] or len(element.find_all()) == 0:
-                                        rating = text[0]  # Just take the first character to be safe
-                                        break
-                            except Exception:
-                                continue
+                    for type_sel in rating_type_selectors:
+                        type_elem = section.select_one(type_sel)
+                        if type_elem and type_elem.get_text(strip=True):
+                            rating_type = type_elem.get_text(strip=True)
+                            break
 
-                    # Extract rating number from the specific structure you provided
-                    rating_elem = section.select_one("div.sc-lq7bklc-1.clJcgx")
-                    if rating_elem:
-                        rating = rating_elem.get_text(strip=True)
-                        extraction_method = "div.sc-lq7bklc-1.clJcgx (HTML rating)"
+                    # Extract date using the correct class name found in HTML analysis
+                    date_element = section.find('p', class_='fKvqMN time-stamp')
+                    if date_element:
+                        date = date_element.get_text(strip=True)
                     else:
-                        rating = "N/A"
+                        # Try the fKvqMN class without time-stamp
+                        date_element = section.find(class_='fKvqMN')
+                        if date_element:
+                            date_text = date_element.get_text(strip=True)
+                            # Check if it contains date-like patterns
+                            if any(pattern in date_text.lower() for pattern in ['ago', 'day', 'week', 'month', 'year', 'yesterday', 'today']):
+                                date = date_text
+                            else:
+                                date = "N/A"
+                        else:
+                            # Fallback: try other possible date selectors
+                            date_selectors = [
+                                'p[class*="time-stamp"]',
+                                'span[class*="time-stamp"]',
+                                'div[class*="time-stamp"]',
+                                'p[class*="fKvqMN"]',
+                                'span[class*="fKvqMN"]',
+                                'div[class*="fKvqMN"]'
+                            ]
+                            date = "N/A"
+                            for selector in date_selectors:
+                                date_element = section.select_one(selector)
+                                if date_element:
+                                    date_text = date_element.get_text(strip=True)
+                                    # Check if it contains date-like patterns
+                                    if any(pattern in date_text.lower() for pattern in ['ago', 'day', 'week', 'month', 'year', 'yesterday', 'today']):
+                                        date = date_text
+                                        break
 
-                    # Extract rating type from the specific structure you provided
-                    rating_type_elem = section.select_one("div.sc-lq7bklc-9.dYrjiW")
-                    if rating_type_elem:
-                        rating_type = rating_type_elem.get_text(strip=True)
-                    
-                    # Extract date from the specific structure you provided
-                    date_elem = section.select_one("p.sc-lhez2tp-0.fKvqMN.time-stamp")
-                    if date_elem:
-                        date = date_elem.get_text(strip=True)
-                    
                     # Extract review text (based on actual HTML structure)
                     text_selectors = [
                         "p.sc-1hez2tp-0.sc-hfLElm.hreYiP",  # Specific class for review text
@@ -462,31 +420,6 @@ def extract_reviews_with_multiple_selectors(soup, restaurant_name="N/A"):
                             review_text = text_elem.get_text(strip=True)
                             break
 
-                    # Extract date (based on actual HTML structure)
-                    date_selectors = [
-                        "p.sc-lhez2tp-0.fKvqMN.time-stamp",  # Updated specific class for timestamps based on your HTML
-                        "p.sc-1hez2tp-0.fKvqMN.time-stamp",  # Previous specific class for timestamps
-                        "p.sc-1hez2tp-0.fKvqMN",
-                        "p[class*='time-stamp']",
-                        "p[color='#9C9C9C']",
-                        "span[class*='time']",
-                        "div[class*='date']",
-                        "time",
-                    ]
-
-                    date = "N/A"
-                    for date_sel in date_selectors:
-                        date_elem = section.select_one(date_sel)
-                        if date_elem and date_elem.get_text(strip=True):
-                            # Skip if it contains text like "Votes" or "Comments"
-                            date_text = date_elem.get_text(strip=True)
-                            if not any(
-                                word in date_text.lower()
-                                for word in ["vote", "comment", "helpful"]
-                            ):
-                                date = date_text
-                                break
-                                
                     # Keep rating as N/A if not found - we'll get it from JSON-LD later
                     if rating == "N/A":
                         extraction_method = f"{selector} (no rating found)"
@@ -688,9 +621,9 @@ try:
             
             time.sleep(2)  # Additional wait for dynamic content
             
-            # Try to trigger loading of more reviews by scrolling multiple times
-            for scroll_attempt in range(3):
-                print(f"[DEBUG] Scroll attempt {scroll_attempt + 1}/3")
+            # Try to trigger loading of more reviews by scrolling once
+            for scroll_attempt in range(1):
+                print(f"[DEBUG] Scroll attempt {scroll_attempt + 1}/1")
                 human_like_scroll(driver, pause_time=2)
                 time.sleep(2)
                 
@@ -706,56 +639,101 @@ try:
             # Wait a bit more after scrolling to ensure all content is loaded
             time.sleep(3)
             
+            # Take a screenshot for debugging each page
+            if DEMO_MODE:
+                debug_dir = "data/raw/debug"
+                os.makedirs(debug_dir, exist_ok=True)
+                try:
+                    screenshot_path = f"{debug_dir}/page_{page_num}_screenshot.png"
+                    driver.save_screenshot(screenshot_path)
+                    print(f"[DEBUG] Saved screenshot for page {page_num}: {screenshot_path}")
+                except Exception as e:
+                    print(f"[DEBUG] Could not save screenshot for page {page_num}: {e}")
+            
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
+            
+            # Save page source for debugging each page
+            if DEMO_MODE:
+                try:
+                    page_source_path = f"{debug_dir}/page_{page_num}_source.html"
+                    with open(page_source_path, "w", encoding="utf-8") as f:
+                        f.write(page_source)
+                    print(f"[DEBUG] Saved page source for page {page_num}: {page_source_path}")
+                except Exception as e:
+                    print(f"[DEBUG] Could not save page source for page {page_num}: {e}")
 
             # Primary method: HTML parsing to get all reviews from the page
-            # First try HTML extraction
-            page_reviews = extract_reviews_with_multiple_selectors(soup, restaurant_name)
+            # Prioritize HTML extraction over JSON-LD to get paginated content
+            page_reviews = extract_reviews_with_multiple_selectors(soup, str(restaurant_name))
             
-            # Always extract from JSON-LD as well to get ratings
-            json_reviews = extract_reviews_from_json_ld(soup)
+            # Only use JSON-LD as fallback for rating/text enhancement, not as primary source
+            json_reviews = extract_reviews_from_json_ld(soup) if page_num == 1 else []  # Only use JSON-LD on first page
             
             if page_reviews:
                 print(f"[DEBUG] ✅ Found {len(page_reviews)} reviews via HTML extraction")
                 
-                # If we have both HTML and JSON-LD reviews, try to match them by reviewer name
-                # to get the ratings from JSON-LD
-                if json_reviews:
-                    print(f"[DEBUG] Also found {len(json_reviews)} reviews in JSON-LD data")
-                    # Create a dictionary of JSON-LD reviews by reviewer name for quick lookup
-                    json_reviews_by_reviewer = {r['reviewer']: r for r in json_reviews}
+                # Only enhance with JSON-LD data on the first page (since JSON-LD is static)
+                if json_reviews and page_num == 1:
+                    print(f"[DEBUG] Also found {len(json_reviews)} reviews in JSON-LD data (first page only)")
                     
-                    # Update HTML reviews with ratings from JSON-LD where possible
+                    # Enhance HTML reviews with JSON-LD ratings/text where reviewer names match
+                    json_reviews_by_reviewer = {r['reviewer']: r for r in json_reviews}
                     enhanced_count = 0
+                    
                     for html_review in page_reviews:
                         reviewer_name = html_review['reviewer']
                         if reviewer_name in json_reviews_by_reviewer:
-                            # Get rating from JSON-LD data
                             json_review = json_reviews_by_reviewer[reviewer_name]
                             
-                            # Always update rating from JSON-LD (it's more reliable)
-                            html_review['rating'] = json_review['rating']
-                            html_review['extraction_method'] = f"{html_review['extraction_method']} + json-ld rating"
-                            enhanced_count += 1
-                                
-                            # Also update review text if it was missing from HTML
-                            if html_review['review_text'] == "N/A" and json_review['review_text'] != "N/A":
-                                html_review['review_text'] = json_review['review_text']
-                    
-                    # For reviews that couldn't be matched from HTML but exist in JSON-LD, add them directly
-                    html_reviewer_names = {r['reviewer'] for r in page_reviews}
-                    for json_review in json_reviews:
-                        if json_review['reviewer'] not in html_reviewer_names:
-                            # Add the JSON-LD review directly
-                            json_review['restaurant_name'] = restaurant_name
-                            page_reviews.append(json_review)
-                            enhanced_count += 1
+                            # Enhance rating if missing from HTML
+                            if html_review['rating'] == "N/A" and json_review['rating'] != "N/A":
+                                html_review['rating'] = json_review['rating']
+                                html_review['extraction_method'] += " + json-ld rating"
+                                enhanced_count += 1
+                            
+                            # Enhance review text if HTML version is poor quality
+                            html_text = html_review['review_text']
+                            json_text = json_review['review_text']
+                            if (json_text != "N/A" and json_text != reviewer_name and len(json_text) > 10 and
+                                (html_text == "N/A" or html_text == reviewer_name or len(html_text) < 10)):
+                                html_review['review_text'] = json_text
+                                html_review['extraction_method'] += " + json-ld text"
+                                enhanced_count += 1
                     
                     if enhanced_count > 0:
-                        print(f"[DEBUG] Enhanced/added {enhanced_count} reviews with data from JSON-LD")
+                        print(f"[DEBUG] Enhanced {enhanced_count} HTML reviews with JSON-LD data")
                 
-                restaurant_reviews.extend(page_reviews)
+                # Filter out poor quality reviews
+                filtered_reviews = []
+                for review in page_reviews:
+                    reviewer_name = review['reviewer']
+                    review_text = review['review_text']
+                    
+                    # Keep review if it has a valid reviewer name and either a rating or meaningful text
+                    if (reviewer_name != "N/A" and reviewer_name.strip() != "" and
+                        (review['rating'] != "N/A" or 
+                         (review_text != "N/A" and review_text != reviewer_name and len(review_text.strip()) > 5))):
+                        filtered_reviews.append(review)
+                
+                page_reviews = filtered_reviews
+                print(f"[DEBUG] After filtering: {len(page_reviews)} quality reviews from page {page_num}")
+                
+                # Check for duplicates in existing restaurant_reviews before adding new ones
+                # Use a combination of reviewer name + review text for better uniqueness detection
+                existing_review_keys = {(r['reviewer'], r['review_text'][:50]) for r in restaurant_reviews}
+                new_reviews = []
+                
+                for review in page_reviews:
+                    review_key = (review['reviewer'], review['review_text'][:50])
+                    if review_key not in existing_review_keys:
+                        new_reviews.append(review)
+                        existing_review_keys.add(review_key)
+                    else:
+                        print(f"[DEBUG] Skipping duplicate review from {review['reviewer']}")
+                
+                restaurant_reviews.extend(new_reviews)
+                print(f"[DEBUG] Added {len(new_reviews)} new unique reviews (out of {len(page_reviews)} found on page)")
                 print(f"[DEBUG] Total reviews collected for {restaurant_name}: {len(restaurant_reviews)}")
             elif json_reviews:
                 # Fallback to JSON-LD if HTML parsing fails
@@ -916,7 +894,7 @@ try:
                         time.sleep(wait_interval)
                         current_source = driver.page_source
                         current_soup = BeautifulSoup(current_source, "html.parser")
-                        current_reviews = extract_reviews_with_multiple_selectors(current_soup, restaurant_name)
+                        current_reviews = extract_reviews_with_multiple_selectors(current_soup, str(restaurant_name))
                         
                         # Check if content has changed (different reviews or different content)
                         new_content = current_soup.get_text()
@@ -995,7 +973,7 @@ try:
     else:
         # Still create empty CSV
         empty_df = pd.DataFrame(
-            columns=["restaurant_name", "reviewer", "rating", "rating_type", "review_text", "date", "extraction_method"]
+            columns=pd.Index(["restaurant_name", "reviewer", "rating", "rating_type", "review_text", "date", "extraction_method"])
         )
         empty_df.to_csv(csv_path, index=False)
         print(f"[DEBUG] ⚠️ No reviews extracted. Saved empty CSV to: {csv_path}")

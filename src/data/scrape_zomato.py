@@ -34,14 +34,23 @@ chrome_options.add_argument("--disable-extensions")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option("useAutomationExtension", False)
 
-# Set path to ChromeDriver
-CHROMEDRIVER_PATH = "/usr/bin/chromedriver"
+# Get ChromeDriver path from environment variable
+CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH')
+if not CHROMEDRIVER_PATH:
+    print("Error: CHROMEDRIVER_PATH environment variable not set.")
+    print("Please set CHROMEDRIVER_PATH to the location of your chromedriver.exe")
+    print("Example: $env:CHROMEDRIVER_PATH = 'C:\\path\\to\\chromedriver.exe'")
+    exit(1)
 
 # Create the Browser driver
-service = Service(CHROMEDRIVER_PATH)  # Create a Service object for ChromeDriver
-driver = webdriver.Chrome(
-    service=service, options=chrome_options
-)  # Initialize ChromeDriver with options
+try:
+    service = Service(CHROMEDRIVER_PATH)  # Create a Service object for ChromeDriver
+    driver = webdriver.Chrome(service=service, options=chrome_options)  # Initialize ChromeDriver with options
+except Exception as e:
+    print(f"Error creating Chrome driver: {e}")
+    print(f"ChromeDriver path: {CHROMEDRIVER_PATH}")
+    print("Please ensure the ChromeDriver path is correct and the file exists.")
+    exit(1)
 
 # Add stealth to the driver to mask Selenium automation
 stealth(

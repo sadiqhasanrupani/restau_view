@@ -80,3 +80,5 @@ geckodriver.exe
 *.log
 .coverage
 htmlcov/
+
+*.lock

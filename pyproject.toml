@@ -1,0 +1,14 @@
+[project]
+name = "restau-view"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4",
+    "pandas",
+    "python-dotenv>=1.1.1",
+    "selenium>=4.34.0",
+    "selenium-stealth",
+    "webdriver-manager",
+]
