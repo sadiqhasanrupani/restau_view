@@ -6,8 +6,11 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "beautifulsoup4",
+    "fake-useragent",
     "pandas",
+    "pip",
     "python-dotenv>=1.1.1",
+    "requests-html>=0.10.0",
     "selenium>=4.34.0",
     "selenium-stealth",
     "webdriver-manager",
